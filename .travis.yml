@@ -11,7 +11,7 @@ before_install:
   #   -> Resulting command is from the output of the encryption
   - openssl aes-256-cbc -K $encrypted_9f3b5599b056_key -iv $encrypted_9f3b5599b056_iv -in service-account.json.enc -out service-account.json -d
   # Setup GCLoud CLI on travis
-  - curl https://sdk.cloud.google.com | bash > /dev/null;
+  - export CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash > /dev/null;
   - source $HOME/google-cloud/sdk/path.bash.inc
   - gcloud components update kubectl
   # Log into gcloud with gcloud IAM account
@@ -30,3 +30,8 @@ before_install:
 # All the commands that need to be ran in order for our test suite to run
 script:
   - docker run -e CI=true charlieouyang/react-test npm run test
+
+# Run our deploy script
+deploy:
+  provider: script
+  script: bash ./deploy.sh
