@@ -2,6 +2,13 @@ sudo: required
 services:
   - docker
 
+env:
+  global:
+    # Getting latest git commit hash used for tagging docker images
+    - SHA=$(git rev-parse HEAD)
+    # the export is to disable prompt so we can proceed with installation
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+
 before_install:
   # Use encrypted google cloud service-account.json.enc file to login
   # File was generated
@@ -10,9 +17,8 @@ before_install:
   #   -> Log into travis and encrypt service-account.json and get service-account.json.enc
   #   -> Resulting command is from the output of the encryption
   - openssl aes-256-cbc -K $encrypted_9f3b5599b056_key -iv $encrypted_9f3b5599b056_iv -in service-account.json.enc -out service-account.json -d
-  # the export is to disable prompt so we can proceed with installation
   # Setup GCLoud CLI on travis
-  - export CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash > /dev/null;
+  - curl https://sdk.cloud.google.com | bash > /dev/null;
   - source /home/travis/google-cloud-sdk/path.bash.inc
   - gcloud version
   - gcloud components update kubectl
@@ -37,3 +43,5 @@ script:
 deploy:
   provider: script
   script: bash ./deploy.sh
+  on:
+    branch: master
