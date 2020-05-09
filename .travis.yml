@@ -16,3 +16,17 @@ before_install:
   - gcloud components update kubectl
   # Log into gcloud with gcloud IAM account
   - gcloud auth activate-service-account --key-file service-account.json
+  # Select project ID (beside project name)
+  - gcloud config set project multi-k8s-276600
+  # Set zone
+  - gcloud config set compute/zone us-central1-c
+  # Use multi-cluster
+  - gcloud container clusters get-credentials multi-cluster
+  # Log into docker
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  # Build the UI tests and tag it
+  - docker build -t charlieouyang/react-test -f ./client/Dockerfile.dev ./client
+
+# All the commands that need to be ran in order for our test suite to run
+script:
+  - docker run -e CI=true charlieouyang/react-test npm run test
